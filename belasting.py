@@ -102,6 +102,14 @@ def netto(bruto: float) -> float:
     return bruto - belasting(bruto)
 
 
+# Bereken het totale belasting percentage gegeven een bruto inkomen.
+def belasting_perc(bruto: float) -> float:
+    if bruto == 0.0:
+        return 0.0
+
+    return belasting(bruto) / bruto
+
+
 # Bereken het marginaal belasting percentage gegeven een bruto inkomen.
 def marginale_belasting(bruto: float) -> float:
     return belasting(bruto + 1) - belasting(bruto)
@@ -130,6 +138,7 @@ def print_table(inkomen: float) -> None:
     table.add_row(["Arbeidskorting", f"€ {arbeidskorting(inkomen):10,.2f}"])
     table.add_row(["Effectieve belasting", f"€ {belasting(inkomen):10,.2f}"])
     table.add_row(["Netto inkomen", f"€ {netto(inkomen):10,.2f}"])
+    table.add_row(["Effectieve belasting", f"% {100*belasting_perc(inkomen):10.2f}"])
     table.add_row(
         ["Marginale belasting", f"% {100*marginale_belasting(inkomen):10.2f}"]
     )
@@ -155,7 +164,8 @@ data = {
     "Box 1 tarief": np.array([box1_tarief(i) for i in x]),
     "Algemene heffingskorting": np.array([algemene_heffingskorting(i) for i in x]),
     "Arbeidskorting": np.array([arbeidskorting(i) for i in x]),
-    "Effectieve belasting": np.array([belasting(i) for i in x]),
+    "Effectieve belasting €": np.array([belasting(i) for i in x]),
+    "Effectieve belasting %": np.array([belasting_perc(i) for i in x]),
     "Marginale belasting": np.array([marginale_belasting(i) for i in x]),
 }
 
@@ -217,18 +227,27 @@ p.line(
 )
 p.line(
     x="Bruto inkomen",
-    y="Effectieve belasting",
+    y="Effectieve belasting €",
     source=source,
     line_width=2,
     line_color=palette[10][4],
-    legend_label="Effectieve belasting",
+    legend_label="Effectieve belasting €",
+)
+p.line(
+    x="Bruto inkomen",
+    y="Effectieve belasting %",
+    source=source,
+    line_width=2,
+    line_color=palette[10][5],
+    legend_label="Effectieve belasting %",
+    y_range_name="percentage",
 )
 p.line(
     x="Bruto inkomen",
     y="Marginale belasting",
     source=source,
     line_width=2,
-    line_color=palette[10][5],
+    line_color=palette[10][6],
     legend_label="Marginale belasting",
     y_range_name="percentage",
 )
@@ -244,7 +263,8 @@ hover_tool = HoverTool(
         ("Box 1 tarief", "€ @{Box 1 tarief}{0,0}"),
         ("Algemene heffingskorting", "€ @{Algemene heffingskorting}{0,0}"),
         ("Arbeidskorting", "€ @{Arbeidskorting}{0,0}"),
-        ("Effectieve belasting", "€ @{Effectieve belasting}{0,0}"),
+        ("Effectieve belasting", "€ @{Effectieve belasting €}{0,0}"),
+        ("Effectieve belasting", "@{Effectieve belasting %}{0.00 %}"),
         ("Marginale belasting", "@{Marginale belasting}{0.00 %}"),
     ],
     mode="vline",
