@@ -279,5 +279,5 @@ crosshair_tool = CrosshairTool(
 p.add_tools(hover_tool)
 p.add_tools(crosshair_tool)
 
-output_file("index.html")
+output_file("index.html", title="Inkomstenbelasting 2023")
 save(p)
