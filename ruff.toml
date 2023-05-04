@@ -1,0 +1,13 @@
+select = [
+  "E",   # pycodestyle
+  "F",   # pyflakes
+  "UP",  # pyupgrade
+  "D",   # pydocstyle
+]
+
+ignore = [
+  "D100",  # undocumented-public-module"
+]
+
+[pydocstyle]
+convention = "google"

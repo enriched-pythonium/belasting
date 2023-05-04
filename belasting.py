@@ -11,9 +11,9 @@ from bokeh.palettes import Category10 as palette
 from bokeh.plotting import figure, output_file, save
 from prettytable import PrettyTable
 
-# --------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 # Constanten.
-# --------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 
 # Box 1 belasting tarieven.
 BOX1_TARIEF = 73031.0
@@ -39,18 +39,17 @@ AK_KORTING_1 = 884.0
 AK_KORTING_2 = 4605.0
 AK_KORTING_3 = 5052.0
 
-# --------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 # Functies.
-# --------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 
 
-# Hulpfunctie die 1 van een getal af trekt om leesbaarheid te vergroten.
-def min1(getal: float) -> float:
+def _min1(getal: float) -> float:
     return getal - 1
 
 
-# Bereken het box 1 tarief gegeven een belastbaar inkomen.
 def box1_tarief(inkomen: float) -> float:
+    """Box 1 tarief gegeven een belastbaar inkomen."""
     schijf1_bedrag = min(inkomen, BOX1_TARIEF)
     schijf2_bedrag = max(inkomen - BOX1_TARIEF, 0)
 
@@ -59,24 +58,24 @@ def box1_tarief(inkomen: float) -> float:
     return tarief
 
 
-# Bereken de algemene heffingskorting gegeven een belastbaar inkomen.
 def algemene_heffingskorting(inkomen: float) -> float:
+    """Algemene heffingskorting gegeven een belastbaar inkomen."""
     if inkomen < AH_TARIEF_1:
         korting = AH_KORTING
     elif inkomen < AH_TARIEF_2:
-        korting = AH_KORTING - AH_PERC * (inkomen - min1(AH_TARIEF_1))
+        korting = AH_KORTING - AH_PERC * (inkomen - _min1(AH_TARIEF_1))
     else:
         korting = 0.0
 
     return korting
 
 
-# Bereken de arbeidskorting gegeven een arbeidsinkomen.
 def arbeidskorting(inkomen: float) -> float:
+    """Arbeidskorting gegeven een arbeidsinkomen."""
     if inkomen < AK_TARIEF_1:
         korting = AK_SCHIJF_1_PERC * inkomen
     elif inkomen < AK_TARIEF_2:
-        korting = AK_KORTING_1 + AK_SCHIJF_2_PERC * (inkomen - min1(AK_TARIEF_1))
+        korting = AK_KORTING_1 + AK_SCHIJF_2_PERC * (inkomen - _min1(AK_TARIEF_1))
     elif inkomen < AK_TARIEF_3:
         # Geen idee waarom nu opeens geen min 1 meer nodig is.
         korting = AK_KORTING_2 + AK_SCHIJF_3_PERC * (inkomen - AK_TARIEF_2)
@@ -88,8 +87,11 @@ def arbeidskorting(inkomen: float) -> float:
     return korting
 
 
-# Bereken de totale belasting gegeven een bruto inkomen, rekening houdend met heffingskortingen.
 def belasting(bruto: float) -> float:
+    """Totale belasting gegeven een bruto inkomen.
+
+    Houdt rekening met heffingskortingen.
+    """
     bedrag = (
         box1_tarief(bruto) - algemene_heffingskorting(bruto) - arbeidskorting(bruto)
     )
@@ -97,30 +99,33 @@ def belasting(bruto: float) -> float:
     return max(bedrag, 0.0)
 
 
-# Bereken het netto inkomen gegeven een bruto inkomen, rekening houdend met heffingskortingen.
 def netto(bruto: float) -> float:
+    """Netto inkomen gegeven een bruto inkomen.
+
+    Houdt rekening met heffingskortingen.
+    """
     return bruto - belasting(bruto)
 
 
-# Bereken het totale belasting percentage gegeven een bruto inkomen.
 def belasting_perc(bruto: float) -> float:
+    """Totale belasting percentage gegeven een bruto inkomen."""
     if bruto == 0.0:
         return 0.0
 
     return belasting(bruto) / bruto
 
 
-# Bereken het marginaal belasting percentage gegeven een bruto inkomen.
 def marginale_belasting(bruto: float) -> float:
+    """Marginaal belasting percentage gegeven een bruto inkomen."""
     return belasting(bruto + 1) - belasting(bruto)
 
 
-# --------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 # Voorbeelden.
-# --------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 
 
-def print_table(inkomen: float) -> None:
+def _print_table(inkomen: float) -> None:
     table = PrettyTable()
     table.field_names = ["Label", "Value"]
     table.header = False
@@ -146,15 +151,15 @@ def print_table(inkomen: float) -> None:
     print(table)
 
 
-print_table(0)
-print_table(10000)
-print_table(50000)
-print_table(100000)
-print_table(150000)
+_print_table(0)
+_print_table(10000)
+_print_table(50000)
+_print_table(100000)
+_print_table(150000)
 
-# --------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 # Bereid de data voor.
-# --------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 
 x = np.linspace(0, 150000, 1501)
 
@@ -171,9 +176,9 @@ data = {
 
 source = ColumnDataSource(data=data)
 
-# --------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 # Plot grafieken.
-# --------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 
 p = figure(
     title="Inkomstenbelasting 2023",
